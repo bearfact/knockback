@@ -94,12 +94,12 @@
   })();
 
   Knockback.Model = Backbone.Model.extend({
-    initialize: function(attrs, options) {
+    initialize: function(attrs={}, options={}) {
       this._bindProxiedMethods();
       this._initRelations(attrs, options);
       return this._initAttributes(attrs, options);
     },
-    set: function(attrs, options) {
+    set: function(attrs={}, options={}) {
       var _this = this;
       if (!Backbone.Model.prototype.set.apply(this, [attrs, options])) {
         return false;
