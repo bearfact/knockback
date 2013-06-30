@@ -38,7 +38,7 @@ test "requires 'target' object in config", ->
 
 
 ###################################################################################################
-module 'Knockback.Relation#sourceConstructor'
+module 'Knockback.Relation#sourceConstructor',
   setup: ->
     @relation = new Knockback.Relation name: 'foo', sourceClass: 'Fixtures.Post', target: {}
 

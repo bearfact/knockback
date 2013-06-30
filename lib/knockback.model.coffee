@@ -124,10 +124,13 @@ Knockback.Model = Backbone.Model.extend
         target: @
 
       klass = relation.sourceConstructor()
-      if klass.prototype.set # singular relation
-        @["#{relationName}_display"] = ko.observable({})
-      else if klass.prototype.reset
-        @["#{relationName}_display"] = ko.observableArray()
+      if klass.prototype.reset
+        @["#{relationName}_observable"] = ko.observableArray()
+      else if klass.prototype.isNew # singular relation
+        @["#{relationName}_observable"] = ko.observable({})
+      
 
     @_relationsInitialized = true
 
+
+Knockback.Collection = Backbone.Collection.extend

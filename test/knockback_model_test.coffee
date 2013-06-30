@@ -477,7 +477,7 @@ test 'merges methods from multiple objects', ->
 
 
 ###################################################################################################
-module 'Knockback.Model deferred evaluation of dependent observables'
+module 'Knockback.Model deferred evaluation of dependent observables',
   setup: ->
     @dependentObservables = depObs =
       informFunction: ->
