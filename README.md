@@ -22,3 +22,7 @@ Now you can work with your Backbone models as you normally would, and
 Knockback handles informing Knockout of the changes so your views are
 automatically (re)rendered. Never again will you have to write a tedious
 and error-prone render method in your Backbone view.
+
+
+jsFiddle example:
+http://jsfiddle.net/bearfact/Ug9Yd/
