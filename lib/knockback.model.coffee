@@ -1,6 +1,8 @@
 Knockback.Model = Backbone.Model.extend
 
   initialize: (attrs, options) ->
+    attrs = if attrs != undefined then attrs else {}
+    options = if options != undefined then options else {}
     @_bindProxiedMethods()
     @_initRelations attrs, options
     @_initAttributes attrs, options

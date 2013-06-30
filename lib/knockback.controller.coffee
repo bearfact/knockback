@@ -25,6 +25,7 @@ Knockback.Controller = Backbone.Router.extend
   # Wraps all route handler functions matching routes from this controller with a new function
   # that includes filter functionality.
   initialize: (options) ->
+    options = if options != undefined then options else {}
     @_wrapped = {}
 
     _.each @routes, (name, pattern) =>

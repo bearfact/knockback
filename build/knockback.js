@@ -92,6 +92,8 @@
 
   Knockback.Model = Backbone.Model.extend({
     initialize: function(attrs, options) {
+      attrs = attrs !== void 0 ? attrs : {};
+      options = options !== void 0 ? options : {};
       this._bindProxiedMethods();
       this._initRelations(attrs, options);
       return this._initAttributes(attrs, options);
@@ -250,6 +252,7 @@
   Knockback.Controller = Backbone.Router.extend({
     initialize: function(options) {
       var _this = this;
+      options = options !== void 0 ? options : {};
       this._wrapped = {};
       return _.each(this.routes, function(name, pattern) {
         var handler;
