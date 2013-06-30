@@ -50,6 +50,6 @@ class Knockback.Relation
     source.bind 'remove', -> display(source.models)
     source.bind 'add', ->
       display(source.models)
-      display.sort (m1, m2) ->  m1.position() - m2.position() if m1.position
+      #display.sort (m1, m2) ->  m1.position() - m2.position() if m1.position
 
     source.reset models if models
