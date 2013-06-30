@@ -26,8 +26,8 @@ Knockback.Model = Backbone.Model.extend
     obj = _.extend {}, objs...
     _.each _.functions(obj), (method) =>
       if @[method]
-        throw "dependentObservable would overwrite existing property or method: '#{method}'"
-      @[method] = ko.dependentObservable(obj[method], @, deferEvaluation: true)
+        throw "computed observable would overwrite existing property or method: '#{method}'"
+      @[method] = ko.computed(obj[method], @, deferEvaluation: true)
 
   parse: (response, xhr) ->
     if @ajaxPrefix
@@ -76,11 +76,11 @@ Knockback.Model = Backbone.Model.extend
 
     _.each _.functions(@observables), (methodName) =>
       unless @[methodName]
-        throw "cannot create dependentObservable because model has no method '#{methodName}'"
+        throw "cannot create computed observable because model has no method '#{methodName}'"
       if Knockback.Model.prototype[methodName]
-        throw "dependentObservable would override base class method '#{methodName}'"
+        throw "computed observable would override base class method '#{methodName}'"
 
-      @[methodName] = ko.dependentObservable(@[methodName], @, deferEvaluation: true)
+      @[methodName] = ko.computed(@[methodName], @, deferEvaluation: true)
 
     @set allAttrs, options
 

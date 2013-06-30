@@ -125,9 +125,9 @@
       obj = _.extend.apply(_, [{}].concat(__slice.call(objs)));
       return _.each(_.functions(obj), function(method) {
         if (_this[method]) {
-          throw "dependentObservable would overwrite existing property or method: '" + method + "'";
+          throw "computed observable would overwrite existing property or method: '" + method + "'";
         }
-        return _this[method] = ko.dependentObservable(obj[method], _this, {
+        return _this[method] = ko.computed(obj[method], _this, {
           deferEvaluation: true
         });
       });
@@ -181,12 +181,12 @@
       });
       _.each(_.functions(this.observables), function(methodName) {
         if (!_this[methodName]) {
-          throw "cannot create dependentObservable because model has no method '" + methodName + "'";
+          throw "cannot create computed observable because model has no method '" + methodName + "'";
         }
         if (Knockback.Model.prototype[methodName]) {
-          throw "dependentObservable would override base class method '" + methodName + "'";
+          throw "computed observable would override base class method '" + methodName + "'";
         }
-        return _this[methodName] = ko.dependentObservable(_this[methodName], _this, {
+        return _this[methodName] = ko.computed(_this[methodName], _this, {
           deferEvaluation: true
         });
       });
