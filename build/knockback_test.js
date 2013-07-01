@@ -239,7 +239,7 @@
     config = {
       name: 'foo',
       sourceClass: 'Foo',
-      displayName: 'foo_display',
+      displayName: 'foo_observable',
       inverse: 'bar',
       target: {
         foo: 'bar'
@@ -254,7 +254,7 @@
   test("requires 'name' in config", function() {
     return raises((function() {
       return new Knockback.Relation;
-    }), /you must specify a relation's 'name' property/);
+    }));
   });
 
   test("requires 'sourceClass' in config", function() {
@@ -262,7 +262,7 @@
       return new Knockback.Relation({
         name: 'foo'
       });
-    }), /you must specify a relation's 'sourceClass' property/);
+    }));
   });
 
   test("requires 'target' object in config", function() {
@@ -271,7 +271,7 @@
         name: 'foo',
         sourceClass: 'Foo'
       });
-    }), /you must specify a relation's 'target' property/);
+    }));
   });
 
   module('Knockback.Relation#sourceConstructor', {
@@ -297,7 +297,7 @@
     });
     return raises((function() {
       return rel.sourceConstructor();
-    }), /sourceClass 'Abcdefghijklmnopqrstuvwxyz' is not defined/);
+    }));
   });
 
   module('Knockback.Relation#ref', {
@@ -318,7 +318,7 @@
     rel = new Knockback.Relation(this.relationConfig);
     return raises((function() {
       return rel.ref();
-    }), /sourceClass 'Abcdefghijklmnopqrstuvwxyz' is not defined/);
+    }));
   });
 
   test('returns an instance of sourceClass', function() {
@@ -362,8 +362,8 @@
     return equal(rel.ref().get('name'), 'Joe Test');
   });
 
-  test('calls the #{name}_display method on the target with the source model', function() {
-    return equal(this.relation.ref(), this.target.author_display());
+  test('calls the #{name}_observable method on the target with the source model', function() {
+    return equal(this.relation.ref(), this.target.author_observable());
   });
 
   module('Knockback.Relation#ref for plural relations', {
@@ -399,11 +399,11 @@
     return deepEqual(this.relation.ref().pluck('content'), ['foo', 'bar']);
   });
 
-  test('calls the #{name}_display method on the target with the source collection', function() {
-    return deepEqual(this.relation.ref().models, this.target.comments_display());
+  test('calls the #{name}_observable method on the target with the source collection', function() {
+    return deepEqual(this.relation.ref().models, this.target.comments_observable());
   });
 
-  test('target#{name}_display updates when source collection is reset', function() {
+  test('target#{name}_observable updates when source collection is reset', function() {
     var comments, commentsCollection, newComments;
     expect(2);
     commentsCollection = this.relation.ref();
@@ -414,41 +414,41 @@
         content: 'nay'
       }
     ];
-    this.target.comments_display.subscribe(function() {
-      return ok(true, "triggered comments_display 'subscribe' event");
+    this.target.comments_observable.subscribe(function() {
+      return ok(true, "triggered comments_observable 'subscribe' event");
     });
     commentsCollection.reset(newComments);
-    comments = _.map(this.target.comments_display(), function(c) {
+    comments = _.map(this.target.comments_observable(), function(c) {
       return c.get('content');
     });
     return deepEqual(comments, ['yay', 'nay']);
   });
 
-  test('target#{name}_display updates when an item is added to the source collection', function() {
+  test('target#{name}_observable updates when an item is added to the source collection', function() {
     var comments, commentsCollection;
-    expect(3);
+    expect(2);
     commentsCollection = this.relation.ref();
-    this.target.comments_display.subscribe(function() {
-      return ok(true, "triggered comments_display 'subscribe' event");
+    this.target.comments_observable.subscribe(function() {
+      return ok(true, "triggered comments_observable 'subscribe' event");
     });
     commentsCollection.add({
       content: 'added'
     });
-    comments = _.map(this.target.comments_display(), function(c) {
+    comments = _.map(this.target.comments_observable(), function(c) {
       return c.get('content');
     });
     return deepEqual(comments, ['foo', 'bar', 'added']);
   });
 
-  test('target#{name}_display updates when an item is removed from the source collection', function() {
+  test('target#{name}_observable updates when an item is removed from the source collection', function() {
     var comments, commentsCollection;
     expect(2);
     commentsCollection = this.relation.ref();
-    this.target.comments_display.subscribe(function() {
-      return ok(true, "triggered comments_display 'subscribe' event");
+    this.target.comments_observable.subscribe(function() {
+      return ok(true, "triggered comments_observable 'subscribe' event");
     });
     commentsCollection.remove(this.relation.ref().first());
-    comments = _.map(this.target.comments_display(), function(c) {
+    comments = _.map(this.target.comments_observable(), function(c) {
       return c.get('content');
     });
     return deepEqual(comments, ['bar']);
@@ -468,7 +468,9 @@
       _previousAttributes: true,
       _changed: true,
       ajaxPrefix: true,
-      disableSync: true
+      disableSync: true,
+      changed: true,
+      validationError: true
     };
     return _.each(Backbone.Model.prototype, function(value, key) {
       if (skipAttributes[key]) {
@@ -531,12 +533,14 @@
     var M, m;
     M = Knockback.Model.extend({
       validate: function(attrs) {
-        return 'invalid';
+        return "an error happened";
       }
     });
     m = new M;
     return same(m.set({
       foo: 'bar'
+    }, {
+      validate: true
     }), false);
   });
 
@@ -675,7 +679,7 @@
     });
     return raises((function() {
       return new M;
-    }), /cannot create dependentObservable because model has no method 'foo'/);
+    }));
   });
 
   test('raises error if method is a Backbone.Model or Knockback.Model method', function() {
@@ -687,7 +691,7 @@
     });
     return raises((function() {
       return new M;
-    }), /dependentObservable would override base class method 'save'/);
+    }));
   });
 
   module("Knockback.Model: unspecified attributes");
@@ -773,7 +777,7 @@
     });
     return raises((function() {
       return new SomeModel;
-    }), /sourceClass 'Foo' is not defined/);
+    }));
   });
 
   test('throws an error if a relation would overwrite an existing property', function() {
@@ -797,19 +801,19 @@
     return equal(p.author.ref().name(), "");
   });
 
-  test("creates an observable '_display' method", function() {
+  test("creates an observable '_observable' method", function() {
     var model, p;
     p = new Fixtures.Post;
-    ok(p.author_display, "model should have 'author_display' property");
-    ok(p.author_display.__ko_proto__, "'author_display' property should be an observable");
+    ok(p.author_observable, "model should have 'author_observable' property");
+    ok(p.author_observable.__ko_proto__, "'author_observable' property should be an observable");
     model = p.author.ref();
-    return equal(p.author_display(), model);
+    return equal(p.author_observable(), model);
   });
 
-  test("initial value for _display method is an empty object", function() {
+  test("initial value for _observable method is an empty object", function() {
     var p;
     p = new Fixtures.Post;
-    return deepEqual({}, p.author_display());
+    return deepEqual({}, p.author_observable());
   });
 
   test("initialize belongsTo relation with nested attributes", function() {
@@ -820,7 +824,7 @@
       }
     });
     equal(p.author.ref().name(), 'Foo Bar');
-    return equal(p.author_display().name(), 'Foo Bar');
+    return equal(p.author_observable().name(), 'Foo Bar');
   });
 
   test("attribute change updates related model's attributes", function() {
@@ -863,19 +867,19 @@
     return deepEqual(this.post.comments.ref().models, []);
   });
 
-  test("creates an observableArray '_display' method", function() {
-    ok(this.post.comments_display, "model should have a 'comments_display' property");
-    ok(this.post.comments_display.__ko_proto__, "'comments_display' property should be an observable");
-    ok(this.post.comments_display.push, "'comments_display' property should be an observableArray");
-    deepEqual(this.post.comments_display(), []);
+  test("creates an observableArray '_observable' method", function() {
+    ok(this.post.comments_observable, "model should have a 'comments_observable' property");
+    ok(this.post.comments_observable.__ko_proto__, "'comments_observable' property should be an observable");
+    ok(this.post.comments_observable.push, "'comments_observable' property should be an observableArray");
+    deepEqual(this.post.comments_observable(), []);
     deepEqual(this.post.comments.ref().models, []);
-    return deepEqual(this.post.comments_display(), this.post.comments.ref().models);
+    return deepEqual(this.post.comments_observable(), this.post.comments.ref().models);
   });
 
-  test("initial value for _display method is an empty array", function() {
+  test("initial value for _observable method is an empty array", function() {
     var p;
     p = new Fixtures.Post;
-    return deepEqual([], p.comments_display());
+    return deepEqual([], p.comments_observable());
   });
 
   test("initialize hasMany relation with nested array of attributes", function() {
@@ -884,7 +888,7 @@
       comments: this.comments
     });
     deepEqual(_.pluck(p.comments.ref().models, 'attributes'), this.comments);
-    return deepEqual(_.pluck(p.comments_display(), 'attributes'), this.comments);
+    return deepEqual(_.pluck(p.comments_observable(), 'attributes'), this.comments);
   });
 
   test("collection resets when attribute changes", function() {
@@ -892,7 +896,7 @@
     this.post.bind('change:comments', function() {
       return ok(true);
     });
-    this.post.comments.ref().bind('reset', function() {
+    this.post.comments.ref().bind('change', function() {
       return ok(true);
     });
     this.post.set({
@@ -906,11 +910,11 @@
     this.post.comments.ref().bind('reset', function() {
       return ok(true);
     });
-    this.post.comments_display.subscribe(function() {
+    this.post.comments_observable.subscribe(function() {
       return ok(true);
     });
     this.post.comments.ref().reset(this.comments);
-    return deepEqual(_.pluck(this.post.comments_display(), 'attributes'), this.comments);
+    return deepEqual(_.pluck(this.post.comments_observable(), 'attributes'), this.comments);
   });
 
   test("knockout binding updates when an item is added to the collection", function() {
@@ -918,11 +922,11 @@
     this.post.comments.ref().bind('add', function() {
       return ok(true, "comments 'add' event was triggered");
     });
-    this.post.comments_display.subscribe(function() {
-      return ok(true, "comments_display 'subscribe' event was triggered");
+    this.post.comments_observable.subscribe(function() {
+      return ok(true, "comments_observable 'subscribe' event was triggered");
     });
     this.post.comments.ref().add(this.comments[0]);
-    return deepEqual(_.pluck(this.post.comments_display(), 'attributes'), [this.comments[0]]);
+    return deepEqual(_.pluck(this.post.comments_observable(), 'attributes'), [this.comments[0]]);
   });
 
   test("knockout binding updates when an item is removed from the collection", function() {
@@ -931,11 +935,11 @@
     this.post.comments.ref().bind('remove', function() {
       return ok(true, "comments 'remove' event was triggered");
     });
-    this.post.comments_display.subscribe(function() {
-      return ok(true, "comments_display 'subscribe' event was triggered");
+    this.post.comments_observable.subscribe(function() {
+      return ok(true, "comments_observable 'subscribe' event was triggered");
     });
     this.post.comments.ref().remove(this.post.comments.ref().first());
-    return deepEqual(_.pluck(this.post.comments_display(), 'attributes'), [this.comments[1]]);
+    return deepEqual(_.pluck(this.post.comments_observable(), 'attributes'), [this.comments[1]]);
   });
 
   test("knockout binding is sorted by position", function() {
@@ -957,12 +961,12 @@
       }
     ];
     this.post.comments.ref().add(positionalComments);
-    commentsOrder = _.map(this.post.comments_display(), function(comment) {
+    commentsOrder = _.map(this.post.comments_observable(), function(comment) {
       return comment.position();
     });
     lastPosition = -1;
-    return _.each(this.post.comments_display(), function(comment) {
-      ok(comment.position() > lastPosition, "comments_display() should display comments in order, but order was [" + commentsOrder + "]");
+    return _.each(this.post.comments_observable(), function(comment) {
+      ok(comment.position() > lastPosition, "comments_observable() should display comments in order, but order was [" + commentsOrder + "]");
       return lastPosition = comment.position();
     });
   });
@@ -1137,7 +1141,7 @@
     };
     return raises((function() {
       return _this.model.includeObservables(P);
-    }), /dependentObservable would overwrite existing property or method: 'save'/);
+    }));
   });
 
   test('merges methods from multiple objects', function() {

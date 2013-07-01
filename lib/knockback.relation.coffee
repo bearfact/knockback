@@ -41,10 +41,10 @@ class Knockback.Relation
 
   _sourceModel: (source, attrs) ->
     source.set attrs
-    @target["#{@name}_display"](source)
+    @target["#{@name}_observable"](source)
 
   _sourceCollection: (source, models) ->
-    display = @target["#{@name}_display"]
+    display = @target["#{@name}_observable"]
 
     source.bind 'reset', -> display(source.models)
     source.bind 'remove', -> display(source.models)

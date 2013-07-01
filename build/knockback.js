@@ -61,12 +61,12 @@
 
     Relation.prototype._sourceModel = function(source, attrs) {
       source.set(attrs);
-      return this.target["" + this.name + "_display"](source);
+      return this.target["" + this.name + "_observable"](source);
     };
 
     Relation.prototype._sourceCollection = function(source, models) {
       var display;
-      display = this.target["" + this.name + "_display"];
+      display = this.target["" + this.name + "_observable"];
       source.bind('reset', function() {
         return display(source.models);
       });
@@ -74,12 +74,7 @@
         return display(source.models);
       });
       source.bind('add', function() {
-        display(source.models);
-        return display.sort(function(m1, m2) {
-          if (m1.position) {
-            return m1.position() - m2.position();
-          }
-        });
+        return display(source.models);
       });
       if (models) {
         return source.reset(models);
